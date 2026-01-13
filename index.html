@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NOVA GENESIS MOVIE SERVER</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- GOOGLE FONTS -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- FONT AWESOME -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- THREE JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+:root{
+  --cyan:#00f3ff;
+  --purple:#7f5cff;
+  --gold:#ffd369;
+  --bg:#0b0b0f;
+  --glass:rgba(255,255,255,0.05);
+  --border:rgba(255,255,255,0.12);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Rajdhani',sans-serif;
+  background:var(--bg);
+  color:#fff;
+  overflow-x:hidden;
+}
+
+canvas{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+}
+
+/* NAV */
+nav{
+  position:fixed;
+  top:0;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  padding:20px;
+  backdrop-filter:blur(15px);
+  background:rgba(0,0,0,.6);
+  border-bottom:1px solid var(--border);
+  z-index:999;
+}
+nav a{
+  margin:0 25px;
+  text-decoration:none;
+  color:#bbb;
+  font-weight:600;
+  letter-spacing:2px;
+}
+nav a:hover{color:var(--cyan);}
+
+/* HERO + PROFILE */
+.hero-wrapper{
+  display:flex;
+  gap:40px;
+  padding:140px 8% 100px;
+  align-items:flex-start;
+}
+
+#hero{
+  flex:1;
+}
+#hero h1{
+  font-family:Orbitron;
+  font-size:clamp(3rem,7vw,5.5rem);
+  letter-spacing:8px;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 30px rgba(0,243,255,.4);
+}
+#hero p{
+  margin-top:20px;
+  opacity:.85;
+  font-size:1.4rem;
+}
+
+/* PROFILE CARD */
+#profile-card{
+  width:320px;
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:25px;
+  text-align:center;
+  backdrop-filter:blur(10px);
+}
+
+#profile-card img{
+  width:100%;
+  border-radius:15px;
+  margin-bottom:18px;
+}
+
+/* ORIGINAL DROP ANIMATION */
+@keyframes cyberDrop{
+  0%{opacity:0;transform:translateY(-40px);filter:blur(6px);}
+  100%{opacity:1;transform:translateY(0);filter:blur(0);}
+}
+.animate{opacity:0;}
+.animate.active{
+  animation:cyberDrop 1.3s cubic-bezier(.19,1,.22,1) forwards;
+}
+
+/* NAME STYLE */
+#profile-card h3{
+  font-family:Orbitron;
+  font-size:1.6rem;
+  letter-spacing:3px;
+  color:var(--cyan);
+  margin-bottom:10px;
+}
+
+/* TYPING TEXT STYLE - WHITE */
+#typing-container {
+  min-height: 50px;
+  margin-bottom: 10px;
+}
+#typing {
+  font-size: 1.05rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+.cursor {
+  display: inline-block;
+  width: 2px;
+  background-color: var(--cyan);
+  margin-left: 2px;
+  animation: blink 0.7s infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* CONTACT BUTTON */
+.profile-btn{
+  margin-top:15px;
+  display:inline-block;
+  padding:10px 22px;
+  border:1px solid var(--cyan);
+  color:var(--cyan);
+  text-decoration:none;
+  font-weight:600;
+  transition: 0.3s;
+}
+.profile-btn:hover{
+  background:var(--cyan);
+  color:#000;
+  box-shadow: 0 0 15px var(--cyan);
+}
+
+/* SECTIONS */
+section{padding:110px 8%;}
+h2{
+  text-align:center;
+  font-family:Orbitron;
+  letter-spacing:4px;
+  color:var(--cyan);
+  margin-bottom:50px;
+}
+
+/* CARDS */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:30px;
+}
+.card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:30px;
+  text-align:center;
+  cursor:pointer;
+  transition:.4s;
+}
+.card:hover{
+  transform:translateY(-8px) scale(1.04);
+  box-shadow:0 0 35px rgba(0,243,255,.25);
+}
+.card h3{font-family:Orbitron; margin-bottom:10px;}
+.card p{color:var(--cyan);}
+
+/* NOTE STYLE */
+.note{
+  text-align:center;
+  margin-top:40px;
+  color:var(--cyan);
+  font-size:1rem;
+  opacity: 0.8;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+footer{
+  text-align:center;
+  padding:40px;
+  opacity:.8;
+  border-top: 1px solid var(--border);
+}
+footer strong{color:var(--cyan);}
+
+@media(max-width:1000px){
+  .hero-wrapper{flex-direction:column;align-items:center;}
+  #profile-card{width:85%;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<nav>
+  <a href="#hero">HOME</a>
+  <a href="#movies">MOVIES</a>
+  <a href="#other">OTHER</a>
+  <a href="#contact">CONTACT</a>
+</nav>
+
+<div class="hero-wrapper">
+  <section id="hero">
+    <h1>NOVA GENESIS MOVIE SERVER</h1>
+    <p>All Languages • Verified Sources • Private Network</p>
+  </section>
+
+  <div id="profile-card" class="animate active">
+    <img src="profile.jpg" alt="Nahid">
+    <h3 class="animate active">NAHID</h3>
+    
+    <div id="typing-container">
+      <span id="typing"></span><span class="cursor">|</span>
+    </div>
+
+    <a class="profile-btn" href="mailto:genesiscorporation2050@gmail.com">CONTACT</a>
+  </div>
+</div>
+
+<section id="movies">
+  <h2>AVAILABLE MOVIES</h2>
+  <div class="grid">
+    <div class="card" onclick="window.open('http://172.16.50.7/DHAKA-FLIX-7/English%20Movies/')">
+      <h3>ENGLISH</h3><p>Click to view English movies with release year</p>
+    </div>
+    <div class="card" onclick="window.open('http://172.16.50.14/DHAKA-FLIX-14/Hindi%20Movies/')">
+      <h3>HINDI</h3><p>Click to view Hindi movies with release year</p>
+    </div>
+    <div class="card" onclick="window.open('http://172.16.50.7/DHAKA-FLIX-7/Foreign%20Language%20Movies/')">
+      <h3>FOREIGN</h3><p>Click to view Foreign movies with release year</p>
+    </div>
+  </div>
+  
+  <!-- Added Note here -->
+  <p class="note">
+    <i class="fa-solid fa-circle-info"></i> NOTE: Private IP servers may not work outside the local network.
+  </p>
+</section>
+
+<section id="other">
+  <h2>OTHER WEBSITES</h2>
+  <div class="grid">
+    <div class="card" onclick="window.open('http://bdixtv.serverbd247.com')"><h3>BPL LIVE</h3></div>
+    <div class="card" onclick="window.open('http://10.1.1.1')"><h3>FTP MOVIE</h3></div>
+    <div class="card" onclick="window.open('http://movielinkbd.to')"><h3>MOVIE LINK BD</h3></div>
+  </div>
+</section>
+
+<footer>
+© 2026 NOVA GENESIS MOVIE SERVER | Developed by <strong>Nahid4x</strong>
+</footer>
+
+<script>
+/* TYPING ANIMATION SCRIPT */
+const typingText = document.getElementById("typing");
+const roles = [
+  "Cyber Security Specialist",
+  "Professional Web Developer",
+  "Digital Architect",
+  "PUBG MOBILE Esports Coach",
+  "Esports Player"
+];
+
+let roleIdx = 0;
+let charIdx = 0;
+let isDeleting = false;
+let typeSpeed = 100;
+
+function typeEffect() {
+  const currentRole = roles[roleIdx];
+  
+  if (isDeleting) {
+    typingText.textContent = currentRole.substring(0, charIdx - 1);
+    charIdx--;
+    typeSpeed = 50; 
+  } else {
+    typingText.textContent = currentRole.substring(0, charIdx + 1);
+    charIdx++;
+    typeSpeed = 100;
+  }
+
+  if (!isDeleting && charIdx === currentRole.length) {
+    isDeleting = true;
+    typeSpeed = 2000; 
+  } else if (isDeleting && charIdx === 0) {
+    isDeleting = false;
+    roleIdx = (roleIdx + 1) % roles.length;
+    typeSpeed = 500; 
+  }
+
+  setTimeout(typeEffect, typeSpeed);
+}
+
+document.addEventListener("DOMContentLoaded", typeEffect);
+
+/* INTERSECTION OBSERVER FOR ANIMATIONS */
+const obs=new IntersectionObserver(e=>{
+  e.forEach(i=>{if(i.isIntersecting)i.target.classList.add("active");});
+},{threshold:.5});
+document.querySelectorAll(".animate").forEach(el=>obs.observe(el));
+
+/* THREE BACKGROUND */
+const c=document.getElementById("bg");
+const s=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1000);
+const r=new THREE.WebGLRenderer({canvas:c,alpha:true});
+r.setSize(innerWidth,innerHeight);
+
+const g=new THREE.BufferGeometry();
+const n=3000;
+const a=new Float32Array(n*3);
+for(let i=0;i<a.length;i++)a[i]=(Math.random()-.5)*12;
+g.setAttribute("position",new THREE.BufferAttribute(a,3));
+
+const m=new THREE.PointsMaterial({size:.006,color:0x00f3ff,transparent:true,opacity:.7});
+const p=new THREE.Points(g,m);
+s.add(p);
+cam.position.z=3;
+
+function anim(){
+  requestAnimationFrame(anim);
+  p.rotation.y+=.0006;
+  p.rotation.x+=.0003;
+  r.render(s,cam);
+}
+anim();
+</script>
+
+</body>
+</html>
